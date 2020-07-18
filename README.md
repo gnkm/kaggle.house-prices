@@ -31,3 +31,11 @@ docker pull gcr.io/kaggle-images/python
 ```
 ./docker-run.sh py run.py
 ```
+
+## For Development with VSCode
+
+- Install `Remote - Container` package
+- Start jupyter container
+- Input "Remote-Containers: Attach to running container" to command palette
+- Select jupyter container
+- Select python interpreter: Python 3.7.6 64-bit ('base': conda)
