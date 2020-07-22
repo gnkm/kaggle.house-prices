@@ -57,16 +57,21 @@ def main():
 
     X_train = df_train[features]
     y_train = df_train[col_target_name]
-
-    estimator = RidgeCV(
-        alphas=[0.3, 0.5, 0.7],
-        cv=2,
+    param_grid = [
+        {
+            'cv': [5],
+            'scoring': ['r2'],
+            'gcv_mode': ['auto'],
+        },
+    ]
+    gs = GridSearchCV(
+        estimator=RidgeCV(alphas=[i / 10 for i in range(1, 10)]),
+        param_grid=param_grid,
         scoring='r2',
-        gcv_mode='auto',
+        cv=2,
     )
-    estimator.fit(X_train, y_train)
-    print(estimator.score(X_train, y_train))
-    print(estimator.alpha_)
+    gs.fit(X_train, y_train)
+    print(gs.best_score_)
 
 
 if __name__ == '__main__':
