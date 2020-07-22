@@ -71,7 +71,7 @@ def main():
         cv=2,
     )
     gs.fit(X_train, y_train)
-    print(gs.best_score_)
+    print(gs.best_score_) # score: 0.8254907131913196
 
 
 if __name__ == '__main__':
