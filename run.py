@@ -1,7 +1,7 @@
 import copy
 import numpy as np
 import pandas as pd
-from sklearn.linear_model import Ridge
+from sklearn.linear_model import RidgeCV
 from sklearn.model_selection import cross_val_score, GridSearchCV
 import warnings
 
@@ -58,24 +58,15 @@ def main():
     X_train = df_train[features]
     y_train = df_train[col_target_name]
 
-    # Cross validation and grid search
-    param_grid = [
-        {'Ridge__alpha': [0.5, 0.6, 0.7, 0.8, 0.9, 1]},
-    ]
-    gs = GridSearchCV(
-        estimator=Ridge(random_state=1),
-        param_grid=param_grid,
-        scoring='r2',
+    estimator = RidgeCV(
+        alphas=[0.3, 0.5, 0.7],
         cv=2,
-    )
-    scores = cross_val_score(
-        gs,
-        X_train,
-        y_train,
         scoring='r2',
-        cv=5,
+        gcv_mode='auto',
     )
-    print(scores)
+    estimator.fit(X_train, y_train)
+    print(estimator.score(X_train, y_train))
+    print(estimator.alpha_)
 
 
 if __name__ == '__main__':
