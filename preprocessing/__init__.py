@@ -1,4 +1,3 @@
-import copy
 import numpy as np
 import pandas as pd
 
@@ -53,17 +52,9 @@ def load_x():
             = np.log(df['GarageArea'])
         df.loc[df['HasBsmt'] == 1, 'TotalBsmtSF'] \
             = np.log(df['TotalBsmtSF'])
-        # Use `deepcopy()` for making var `feature` immutable.
-        # If `feature` is mutable, 'SalePrice' is added when key is 'train'.
-        # And 'SalePrice' exists in `feature`, when key is 'test'.
-        # This occures error: 'SalePrice' is not index.
-        needed_features = copy.deepcopy(features)
         if key == 'train':
-            needed_features.extend([col_id_name, col_target_name])
-            df = _preprocess_train(df[needed_features])
-        elif key == 'test':
-            needed_features.extend([col_id_name])
-        df = df[needed_features]
+            df = _drop_outlier_by_id(df)
+        df = df[features]
         dfs[key] = df
 
     return dfs
@@ -73,23 +64,6 @@ def load_y():
     df = df[[col_id_name, col_target_name]]
     df = _drop_outlier_by_id(df)
     return df[col_target_name]
-
-def _preprocess_train(df):
-    # Transform for getting normality
-    # Use df.copy().
-    # If don't use, following warning occur.
-    # > A value is trying to be set on a copy of a slice from a DataFrame.
-    # > Try using .loc[row_indexer,col_indexer] = value instead
-    # df['SalePrice'] = np.log(df['SalePrice'])  # => warning
-    df_copied = df.copy()
-    df_copied['SalePrice'] = np.log(df_copied['SalePrice'])
-    # # Dealing with missing data(Drop rows)
-    df_copied = df_copied.dropna(axis='index')
-    # Dealing with outlier: Refer to EDA
-    df_copied = _drop_outlier_by_id(df_copied)
-    return df_copied
-
-    return df_copied
 
 def _drop_outlier_by_id(df):
     for i in dropped_ids:
