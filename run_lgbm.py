@@ -15,10 +15,31 @@ from utils import print_exit
 # use var `now` in config file and submit file.
 now = dt.now().strftime('%Y-%m-%d-%H-%M-%S')
 
-Xs = load_x()
+# @todo: manage config with external file
+config = {
+    'extracted_features': [
+        'OverallQual',
+        'GrLivArea',
+        'GarageArea',
+        'TotalBsmtSF',
+        # Added for getting normality
+        'HasGarage',
+        'HasBsmt',
+    ],
+    'col_id_name': 'Id',
+    'col_target_name': 'SalePrice',
+    'dropped_ids': [524, 1299],
+}
+
+features = config['extracted_features']
+col_id_name = config['col_id_name']
+col_target_name = config['col_target_name']
+dropped_ids = config['dropped_ids']
+
+Xs = load_x(features, dropped_ids)
 X_train_all = Xs['train']
 X_test = Xs['test']
-y_train_all = load_y()
+y_train_all = load_y(col_id_name, col_target_name, dropped_ids)
 
 # @todo: Define params
 # Reference: https://lightgbm.readthedocs.io/en/latest/Parameters-Tuning.html

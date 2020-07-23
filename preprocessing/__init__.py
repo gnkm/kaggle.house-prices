@@ -1,26 +1,13 @@
 import numpy as np
 import pandas as pd
 
-features = [
-    'OverallQual',
-    'GrLivArea',
-    'GarageArea',
-    'TotalBsmtSF',
-    # Added for getting normality
-    'HasGarage',
-    'HasBsmt',
-]
-col_id_name = 'Id'
-col_target_name = 'SalePrice'
-dropped_ids = [524, 1299]
 
-def load_x():
+def load_x(features, dropped_ids):
     """Return dict contains df_X_train and df_X_test.
     
     Args:
         features: List
-        col_id_name: str
-        col_target_name: str
+        dropped_ids: List
     
     Returns:
         Dict
@@ -53,19 +40,19 @@ def load_x():
         df.loc[df['HasBsmt'] == 1, 'TotalBsmtSF'] \
             = np.log(df['TotalBsmtSF'])
         if key == 'train':
-            df = _drop_outlier_by_id(df)
+            df = _drop_outlier_by_id(df, dropped_ids)
         df = df[features]
         dfs[key] = df
 
     return dfs
 
-def load_y():
+def load_y(col_id_name, col_target_name, dropped_ids):
     df = pd.read_feather('data/input/train.feather')
     df = df[[col_id_name, col_target_name]]
-    df = _drop_outlier_by_id(df)
+    df = _drop_outlier_by_id(df, dropped_ids)
     return df[col_target_name]
 
-def _drop_outlier_by_id(df):
+def _drop_outlier_by_id(df, dropped_ids):
     for i in dropped_ids:
         df.drop(df[df['Id'] == i].index)
     return df
