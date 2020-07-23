@@ -59,8 +59,8 @@ def load_x():
         # This occures error: 'SalePrice' is not index.
         needed_features = copy.deepcopy(features)
         if key == 'train':
-            df = _preprocess_train(df)
             needed_features.extend([col_id_name, col_target_name])
+            df = _preprocess_train(df[needed_features])
         elif key == 'test':
             needed_features.extend([col_id_name])
         df = df[needed_features]
@@ -76,12 +76,20 @@ def load_y():
 
 def _preprocess_train(df):
     # Transform for getting normality
-    df['SalePrice'] = np.log(df['SalePrice'])
-    # Dealing with missing data(Drop rows)
-    df = df.dropna(axis='index')
+    # Use df.copy().
+    # If don't use, following warning occur.
+    # > A value is trying to be set on a copy of a slice from a DataFrame.
+    # > Try using .loc[row_indexer,col_indexer] = value instead
+    # df['SalePrice'] = np.log(df['SalePrice'])  # => warning
+    df_copied = df.copy()
+    df_copied['SalePrice'] = np.log(df_copied['SalePrice'])
+    # # Dealing with missing data(Drop rows)
+    df_copied = df_copied.dropna(axis='index')
     # Dealing with outlier: Refer to EDA
-    df = _drop_outlier_by_id(df)
-    return df
+    df_copied = _drop_outlier_by_id(df_copied)
+    return df_copied
+
+    return df_copied
 
 def _drop_outlier_by_id(df):
     for i in dropped_ids:
