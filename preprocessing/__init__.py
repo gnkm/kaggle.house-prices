@@ -50,6 +50,8 @@ def load_y(col_id_name, col_target_name, dropped_ids):
     df = pd.read_feather('data/input/train.feather')
     df = df[[col_id_name, col_target_name]]
     df = _drop_outlier_by_id(df, dropped_ids)
+    # Transform for getting normality
+    df[col_target_name] = np.log(df[col_target_name])
     return df[col_target_name]
 
 def _drop_outlier_by_id(df, dropped_ids):
