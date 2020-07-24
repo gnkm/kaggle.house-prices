@@ -49,7 +49,25 @@ lgbm_params = {
     'num_itarations': 100,
     'num_leaves': 31,
     'boosting': 'dart',
+    'objective': 'regression',
+    'metric': 'rmse',
+    'lambda_l1': 0,
+    'lambda_l2': 0,
+    'verbosity': -1,
 }
+
+# Debug(for faster speed)
+# lgbm_params = {
+#     'max_bin': 10,
+#     'bagging_fraction': 0.8,
+#     'bagging_freq': 3,
+#     'save_binary': True,
+#     'objective': 'regression',
+#     'metric': 'rmse',
+#     'lambda_l1': 0,
+#     'lambda_l2': 0,
+#     'verbosity': -1,
+# }
 
 kf = KFold(n_splits=10)
 for train_index, valid_index in kf.split(X_train_all):
