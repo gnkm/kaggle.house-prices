@@ -1,0 +1,23 @@
+{
+    "extensions": [
+        "CoenraadS.bracket-pair-colorizer-2",
+        "davidhouchin.whitespace-plus",
+        "donjayamanne.githistory",
+        "EditorConfig.EditorConfig",
+        "equinusocio.vsc-material-theme-icons",
+        "ex-codes.pine-script-syntax-highlighter",
+        "gerane.Theme-Zenburn",
+        "imjacobclark.vscode-lisp-formatter",
+        "koehlma.markdown-math",
+        "ms-azuretools.vscode-docker",
+        "ms-python.python",
+        "ms-vscode-remote.remote-containers",
+        "njpwerner.autodocstring",
+        "sainnhe.gruvbox-material",
+        "Sir2B.lispbeautifier",
+        "skyapps.fish-vscode",
+        "streetsidesoftware.code-spell-checker",
+        "tuttieee.emacs-mcx",
+        "vscode-icons-team.vscode-icons"
+    ]
+}
