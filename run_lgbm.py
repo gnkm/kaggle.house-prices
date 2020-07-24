@@ -2,6 +2,7 @@
 from datetime import datetime as dt
 import numpy as np
 import pandas as pd
+from sklearn.metrics import r2_score
 from sklearn.model_selection import KFold
 
 from models import lgbm as my_lgbm
@@ -41,6 +42,10 @@ X_train_all = Xs['train']
 X_test = Xs['test']
 y_train_all = load_y(col_id_name, col_target_name, dropped_ids)
 
+r2s_valid = []
+y_preds = []
+models = []
+
 # @todo: Define params
 # Reference: https://lightgbm.readthedocs.io/en/latest/Parameters-Tuning.html
 lgbm_params = {
@@ -73,10 +78,23 @@ kf = KFold(n_splits=10)
 for train_index, valid_index in kf.split(X_train_all):
     X_train, X_valid = X_train_all.iloc[train_index, :], X_train_all.iloc[valid_index, :]
     y_train, y_valid = y_train_all.iloc[train_index], y_train_all.iloc[valid_index]
-    model_trained = my_lgbm.train(X_train, X_valid, y_train, y_valid, lgbm_params)
-    y_pred = my_lgbm.predict(model_trained, X_test)
 
-print_exit()
+    # Train
+    model_trained = my_lgbm.train(X_train, X_valid, y_train, y_valid, lgbm_params)
+    # Calculate r2 score
+    y_pred_from_train = my_lgbm.predict(model_trained, X_train)
+    y_pred_from_valid = my_lgbm.predict(model_trained, X_valid)
+    r2_valid = r2_score(y_valid, y_pred_from_valid)
+    r2s_valid.append(r2_valid)
+    # Predict
+    y_pred_logarithmic = my_lgbm.predict(model_trained, X_test)
+    # Target var is transformed with `np.log()`
+    y_pred = np.exp(y_pred_logarithmic)
+    y_preds.append(y_pred)
+    models.append(model_trained)
+
+score = np.mean(r2s_valid)
+pred_avg = np.mean(y_preds, axis=0)
 
 # @todo: Evaluation
 score = 1
