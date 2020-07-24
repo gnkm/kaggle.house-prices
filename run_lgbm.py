@@ -96,17 +96,12 @@ for train_index, valid_index in kf.split(X_train_all):
 score = np.mean(r2s_valid)
 pred_avg = np.mean(y_preds, axis=0)
 
-# @todo: Evaluation
-score = 1
-print(score)
-
-# @todo: Imprement
-pred = []
-
-sub_df = X_test[col_id_name]
-sub_df[col_target_name] = pred
+sub_df = pd.DataFrame(
+    pd.read_feather('data/input/test.feather')[col_id_name]
+)
+sub_df[col_target_name] = pred_avg
 sub_df.to_csv(
-    './data/output/sub_{time:%Y%m%d%H%M%S}_{score}.csv'.format(
+    './data/output/sub_{time}_{score:.5f}.csv'.format(
         time=now,
         score=score,
     ),
