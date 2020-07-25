@@ -80,3 +80,10 @@ sub_df.to_csv(
     ),
     index=False
 )
+
+config_file_name = './configs/{time}_{score:.5f}.yml'.format(
+    time=now,
+    score=score,
+)
+with open(config_file_name, 'w') as file:
+    yaml.dump(config, file)
