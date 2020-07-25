@@ -4,6 +4,11 @@
 
 [House Prices: Advanced Regression Techniques](https://www.kaggle.com/c/house-prices-advanced-regression-techniques)
 
+## Reference
+
+- [COMPREHENSIVE DATA EXPLORATION WITH PYTHON | Kaggle](https://www.kaggle.com/pmarcelino/comprehensive-data-exploration-with-python)
+- [Stacked Regressions : Top 4% on LeaderBoard | Kaggle](https://www.kaggle.com/serigne/stacked-regressions-top-4-on-leaderboard)
+
 ## Usage
 
 ### Pull docker image
