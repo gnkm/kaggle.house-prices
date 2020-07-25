@@ -1,4 +1,5 @@
 
+import argparse
 from datetime import datetime as dt
 from lightgbm import LGBMRegressor
 import numpy as np
@@ -18,7 +19,11 @@ from utils import print_exit
 # use var `now` in config file and submit file.
 now = dt.now().strftime('%Y-%m-%d-%H-%M-%S')
 
-with open('configs/default.yml', 'r') as file:
+parser = argparse.ArgumentParser()
+parser.add_argument('--config', default='./configs/default.yml')
+options = parser.parse_args()
+
+with open(options.config, 'r') as file:
     config = yaml.safe_load(file)
 
 features = config['extracted_features']
