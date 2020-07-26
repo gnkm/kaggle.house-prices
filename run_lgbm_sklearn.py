@@ -9,8 +9,9 @@ from sklearn.model_selection import KFold
 import yaml
 
 # from models import lgbm as my_lgbm
+from cv import r2_cv
 from preprocessing import load_x, load_y
-from utils import print_exit
+from utils import print_exit, print_float
 
 
 # Don't define any function in this file,
@@ -31,14 +32,12 @@ col_id_name = config['col_id_name']
 col_target_name = config['col_target_name']
 dropped_ids = config['dropped_ids']
 lgbm_params = config['lgbm_params']
+n_folds = config['cv']['n_folds']
 
 Xs = load_x(features, dropped_ids)
 X_train_all = Xs['train']
 X_test = Xs['test']
 y_train_all = load_y(col_id_name, col_target_name, dropped_ids)
-
-r2s_valid = []
-y_preds = []
 
 reg_params = lgbm_params['instance']
 regressor = LGBMRegressor(
@@ -50,29 +49,11 @@ regressor = LGBMRegressor(
     silent=reg_params['silent'],
 )
 
-kf = KFold(n_splits=10)
-for train_index, valid_index in kf.split(X_train_all):
-    X_train, X_valid = X_train_all.iloc[train_index, :], X_train_all.iloc[valid_index, :]
-    y_train, y_valid = y_train_all.iloc[train_index], y_train_all.iloc[valid_index]
-
-    # Train
-    regressor.fit(
-        X_train,
-        y_train,
-        categorical_feature=lgbm_params['fit']['categorical_feature'],
-    )
-    # Calculate r2 score
-    y_pred_from_valid = regressor.predict(X_valid)
-    r2_valid = r2_score(y_valid, y_pred_from_valid)
-    r2s_valid.append(r2_valid)
-    # Predict
-    y_pred_logarithmic = regressor.predict(X_test)
-    # Target var is transformed with `np.log()`
-    y_pred = np.exp(y_pred_logarithmic)
-    y_preds.append(y_pred)
-
-score = np.mean(r2s_valid)
-pred_avg = np.mean(y_preds, axis=0)
+scores = r2_cv(regressor, X_train_all, y_train_all, n_folds)
+score = scores.mean()
+print_exit(
+    print_float(score)
+)
 
 sub_df = pd.DataFrame(
     pd.read_feather('data/input/test.feather')[col_id_name]
