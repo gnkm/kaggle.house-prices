@@ -49,16 +49,23 @@ regressor = LGBMRegressor(
     silent=reg_params['silent'],
 )
 
-scores = r2_cv(regressor, X_train_all, y_train_all, n_folds)
-score = scores.mean()
-print_exit(
-    print_float(score)
-)
+# cv_scores = r2_cv(regressor, X_train_all, y_train_all, n_folds)
+# cv_score = cv_scores.mean()
+
+# Train
+regressor.fit(X_train_all, y_train_all)
+# Predict
+y_pred_logarithmic = regressor.predict(X_test)
+y_pred = np.exp(y_pred_logarithmic)
+
+# Evaluate
+y_pred_from_train = regressor.predict(X_train_all)
+score = r2_score(y_train_all, y_pred_from_train)
 
 sub_df = pd.DataFrame(
     pd.read_feather('data/input/test.feather')[col_id_name]
 )
-sub_df[col_target_name] = pred_avg
+sub_df[col_target_name] = y_pred
 sub_df.to_csv(
     './data/output/sub_{time}_{score:.5f}.csv'.format(
         time=now,
