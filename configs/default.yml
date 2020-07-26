@@ -24,4 +24,5 @@ lgbm_params:
     categorical_feature:
       - HasGarage
       - HasBsmt
-  
+cv:
+  n_folds: 10
