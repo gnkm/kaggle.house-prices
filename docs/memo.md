@@ -2,7 +2,25 @@
 
 ## Todo
 
+- Grid search
 - アンサンブル学習で予測する
+
+## Consider
+
+### Preprocessing
+
+`run.py`
+
+Whether preprocess X_train, X_test, and y_train at once.
+
+```
+df_train = pd.read_feather('')
+df_test = pd.read_feather('')
+preprocessed_data = load_data(df_train, df_test, col_id_name, col_target_name, dropped_ids)
+X_train_all = preprocessed_data['X_train']
+X_test = preprocessed_data['X_test']
+y_train_all = preprocessed_data['y_train']
+```
 
 ## Study
 
