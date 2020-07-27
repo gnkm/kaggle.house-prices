@@ -16,10 +16,14 @@ lgbm_params:
   instance:
     boosting_type: gbdt
     learning_rate: 0.1
+    # L1 regularization
     reg_alpha: 0
+    # L2 regularization
     reg_lambda: 0
     random_state: 0
     silent: True
+  candidates:
+    reg_alpha_range: {low: 0.1, high: 1.0, step: 0.1}
   fit:
     categorical_feature:
       - HasGarage
