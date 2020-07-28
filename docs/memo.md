@@ -9,9 +9,7 @@
 
 ### Preprocessing
 
-`run.py`
-
-Whether preprocess X_train, X_test, and y_train at once.
+Do preprocess of X_train, X_test, and y_train at once.
 
 ```
 df_train = pd.read_feather('')
@@ -20,6 +18,25 @@ preprocessed_data = load_data(df_train, df_test, col_id_name, col_target_name, d
 X_train_all = preprocessed_data['X_train']
 X_test = preprocessed_data['X_test']
 y_train_all = preprocessed_data['y_train']
+```
+
+### Optimize training data ratio with learning_curve()
+
+=> try 3, 5, 10 for `n_folds`.
+
+```
+# Optimize training data ratio
+# i.e. Search best n_folds
+# @todo: Modulize
+from sklearn.model_selection import learning_curve
+
+train_sizes = range(0.1, 1, 0.1)
+kf = KFold(n_splits=5)
+train_sizes, train_scores, valid_scores \
+    = learning_curve(X_train_all, y_train_all, train_sizes, cv=kf)
+# @todo: Implement f
+best_n_folds = f(train_sizes, train_scores, valid_scores)
+optimizer = LGBMRegressorOptimizer(regressor, X_train_all, y_train_all, best_n_folds, param_candidates)
 ```
 
 ## Study

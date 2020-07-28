@@ -54,19 +54,6 @@ regressor = LGBMRegressor(
 # cv_scores = r2_cv(regressor, X_train_all, y_train_all, n_folds)
 # cv_score = cv_scores.mean()
 
-# Optimize training data ratio
-# i.e. Search best n_folds
-# @todo: Modulize
-from sklearn.model_selection import learning_curve
-
-train_sizes = range(0.1, 1, 0.1)
-kf = KFold(n_splits=5)
-train_sizes, train_scores, valid_scores \
-    = learning_curve(X_train_all, y_train_all, train_sizes, cv=kf)
-# @todo: Implement f
-best_n_folds = f(train_sizes, train_scores, valid_scores)
-# optimizer = LGBMRegressorOptimizer(regressor, X_train_all, y_train_all, best_n_folds, param_candidates)
-
 optimizer = LGBMRegressorOptimizer(regressor, X_train_all, y_train_all, n_folds, param_candidates)
 best_params = optimizer.optimize()
 print_exit(best_params)
