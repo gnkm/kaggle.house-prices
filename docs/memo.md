@@ -2,7 +2,7 @@
 
 ## Todo
 
-- Grid search
+- バイアスとバリアンスの評価
 - アンサンブル学習で予測する
 
 ## Consider
