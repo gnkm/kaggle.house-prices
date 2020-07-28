@@ -51,21 +51,29 @@ regressor = LGBMRegressor(
     silent=reg_params['silent'],
 )
 
-# cv_scores = r2_cv(regressor, X_train_all, y_train_all, n_folds)
-# cv_score = cv_scores.mean()
-
 optimizer = LGBMRegressorOptimizer(regressor, X_train_all, y_train_all, n_folds, param_candidates)
 best_params = optimizer.optimize()
-print_exit(best_params)
+
+optimized_regressor = LGBMRegressor(
+    boosting_type=reg_params['boosting_type'],
+    learning_rate=reg_params['learning_rate'],
+    reg_alpha=best_params['reg_alpha'],
+    reg_lambda=reg_params['reg_lambda'],
+    random_state=reg_params['random_state'],
+    silent=reg_params['silent'],
+)
+
+# cv_scores = r2_cv(optimized_regressor, X_train_all, y_train_all, n_folds)
+# cv_score = cv_scores.mean()
 
 # Train
-regressor.fit(X_train_all, y_train_all)
+optimized_regressor.fit(X_train_all, y_train_all)
 # Predict
-y_pred_logarithmic = regressor.predict(X_test)
+y_pred_logarithmic = optimized_regressor.predict(X_test)
 y_pred = np.exp(y_pred_logarithmic)
 
 # Evaluate
-y_pred_from_train = regressor.predict(X_train_all)
+y_pred_from_train = optimized_regressor.predict(X_train_all)
 score = r2_score(y_train_all, y_pred_from_train)
 
 sub_df = pd.DataFrame(
