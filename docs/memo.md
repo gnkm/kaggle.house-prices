@@ -4,6 +4,7 @@
 
 - `optimizer.optimize()` で得たパラメータを明示する(`config.yml` に保存するなど)
 - アンサンブル学習で予測する
+- install kaggle CLI
 
 ## Consider
 
