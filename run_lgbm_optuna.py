@@ -42,7 +42,7 @@ X_test = Xs['test']
 y_train_all = load_y(col_id_name, col_target_name, dropped_ids)
 
 reg_params = lgbm_params['instance']
-regressor = LGBMRegressor(
+regressor_with_param_candidates = LGBMRegressor(
     boosting_type=reg_params['boosting_type'],
     learning_rate=reg_params['learning_rate'],
     # reg_alpha=reg_params['reg_alpha'],
@@ -51,10 +51,16 @@ regressor = LGBMRegressor(
     silent=reg_params['silent'],
 )
 
-optimizer = LGBMRegressorOptimizer(regressor, X_train_all, y_train_all, n_folds, param_candidates)
+optimizer = LGBMRegressorOptimizer(
+    regressor_with_param_candidates,
+    X_train_all,
+    y_train_all,
+    n_folds,
+    param_candidates
+)
 best_params = optimizer.optimize()
 
-optimized_regressor = LGBMRegressor(
+regressor_with_optimized_params = LGBMRegressor(
     boosting_type=reg_params['boosting_type'],
     learning_rate=reg_params['learning_rate'],
     reg_alpha=best_params['reg_alpha'],
@@ -67,13 +73,13 @@ optimized_regressor = LGBMRegressor(
 # cv_score = cv_scores.mean()
 
 # Train
-optimized_regressor.fit(X_train_all, y_train_all)
+regressor_with_optimized_params.fit(X_train_all, y_train_all)
 # Predict
-y_pred_logarithmic = optimized_regressor.predict(X_test)
+y_pred_logarithmic = regressor_with_optimized_params.predict(X_test)
 y_pred = np.exp(y_pred_logarithmic)
 
 # Evaluate
-y_pred_from_train = optimized_regressor.predict(X_train_all)
+y_pred_from_train = regressor_with_optimized_params.predict(X_train_all)
 score = r2_score(y_train_all, y_pred_from_train)
 
 sub_df = pd.DataFrame(
