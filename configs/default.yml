@@ -26,4 +26,7 @@ lgbm_params:
       - HasGarage
       - HasBsmt
 cv:
+  # Don't use `learning_curve()`, try following numbers by hand.
+  # n_folds: 3
+  # n_folds: 5
   n_folds: 10
