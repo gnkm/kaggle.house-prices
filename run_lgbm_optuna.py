@@ -5,7 +5,7 @@ from lightgbm import LGBMRegressor
 import numpy as np
 import pandas as pd
 from sklearn.metrics import r2_score
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, learning_curve
 import yaml
 
 # from models import lgbm as my_lgbm
@@ -43,10 +43,6 @@ y_train_all = load_y(col_id_name, col_target_name, dropped_ids)
 
 reg_params = lgbm_params['instance']
 regressor_with_param_candidates = LGBMRegressor(
-    boosting_type=reg_params['boosting_type'],
-    learning_rate=reg_params['learning_rate'],
-    # reg_alpha=reg_params['reg_alpha'],
-    reg_lambda=reg_params['reg_lambda'],
     random_state=reg_params['random_state'],
     silent=reg_params['silent'],
 )
@@ -61,10 +57,11 @@ optimizer = LGBMRegressorOptimizer(
 best_params = optimizer.optimize()
 
 regressor_with_optimized_params = LGBMRegressor(
-    boosting_type=reg_params['boosting_type'],
-    learning_rate=reg_params['learning_rate'],
-    reg_alpha=best_params['reg_alpha'],
-    reg_lambda=reg_params['reg_lambda'],
+    boosting_type=best_params['boosting_type'],
+    learning_rate=best_params['learning_rate'],
+    lambda_l1=best_params['lambda_l1'],
+    lambda_l2=best_params['lambda_l2'],
+    # default params
     random_state=reg_params['random_state'],
     silent=reg_params['silent'],
 )

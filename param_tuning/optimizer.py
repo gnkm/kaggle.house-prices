@@ -55,14 +55,35 @@ class LGBMRegressorOptimizer(BaseOptimizer):
     Function `objective` is implemented in this class.
     """
     def objective(self, trial):
-        reg_alpha = trial.suggest_float(
-            'reg_alpha',
-            self.param_candidates['reg_alpha_range']['low'],
-            self.param_candidates['reg_alpha_range']['high'],
-            step=self.param_candidates['reg_alpha_range']['step'],
+        boosting_type = trial.suggest_categorical(
+            'boosting_type',
+            self.param_candidates['boosting_type']
+        )
+        learning_rate = trial.suggest_float(
+            'learning_rate',
+            self.param_candidates['learning_rate']['low'],
+            self.param_candidates['learning_rate']['high'],
+            step=self.param_candidates['learning_rate']['step'],
+        )
+        lambda_l1 = trial.suggest_float(
+            'lambda_l1',
+            self.param_candidates['lambda_l1']['low'],
+            self.param_candidates['lambda_l1']['high'],
+            step=self.param_candidates['lambda_l1']['step'],
+        )
+        lambda_l2 = trial.suggest_float(
+            'lambda_l2',
+            self.param_candidates['lambda_l2']['low'],
+            self.param_candidates['lambda_l2']['high'],
+            step=self.param_candidates['lambda_l2']['step'],
         )
         model = self.model
-        model.set_params(reg_alpha=reg_alpha)
+        model.set_params(
+            boosting_type=boosting_type,
+            learning_rate=learning_rate,
+            lambda_l1=lambda_l1,
+            lambda_l2=lambda_l2,
+        )
         X_train = self.X_train
         y_train = self.y_train
         n_folds = self.n_folds
