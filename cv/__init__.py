@@ -7,7 +7,7 @@ def r2_cv(model, X_train, y_train, n_folds):
         n_folds,
         shuffle=True,
         random_state=42
-    ).get_n_splits(X_train)
+    )
     scores = np.sqrt(
         cross_val_score(
             model,
