@@ -68,9 +68,18 @@ test = all_data[ntrain:]
 - 全ての特徴量を使い，欠損値処理を行う
 - skew の高い特徴量に対し，Box-Cox 変換で normalize する
 
+## LGBM
+
+- [Python API — LightGBM 2.3.2 documentation](https://lightgbm.readthedocs.io/en/latest/Python-API.html)
+- [Parameters — LightGBM 2.3.2 documentation](https://lightgbm.readthedocs.io/en/latest/Parameters.html)
+
 ## Optuna
 
+- [API Reference — Optuna 2.0.0 documentation](https://optuna.readthedocs.io/en/stable/reference/index.html)
+
 ### Trial.suggest_*()
+
+[Trial — Optuna 1.5.0 documentation](https://optuna.readthedocs.io/en/stable/reference/trial.html)
 
 - suggest_categorical(name, choices)
 - suggest_discrete_uniform(name, low, high, q: int)
@@ -78,5 +87,3 @@ test = all_data[ntrain:]
 - suggest_int(name, low, high, step=1, log=False)
 - suggest_loguniform(name, low, high)
 - suggest_uniform(name, low, high)
-
-reference: [Trial — Optuna 1.5.0 documentation](https://optuna.readthedocs.io/en/stable/reference/trial.html)
