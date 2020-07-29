@@ -66,9 +66,6 @@ regressor_with_optimized_params = LGBMRegressor(
     silent=reg_params['silent'],
 )
 
-# cv_scores = r2_cv(optimized_regressor, X_train_all, y_train_all, n_folds)
-# cv_score = cv_scores.mean()
-
 # Train
 regressor_with_optimized_params.fit(X_train_all, y_train_all)
 # Predict
@@ -76,8 +73,8 @@ y_pred_logarithmic = regressor_with_optimized_params.predict(X_test)
 y_pred = np.exp(y_pred_logarithmic)
 
 # Evaluate
-y_pred_from_train = regressor_with_optimized_params.predict(X_train_all)
-score = r2_score(y_train_all, y_pred_from_train)
+scores = r2_cv(regressor_with_optimized_params, X_train_all, y_train_all, n_folds)
+score = scores.mean()
 
 sub_df = pd.DataFrame(
     pd.read_feather('data/input/test.feather')[col_id_name]
