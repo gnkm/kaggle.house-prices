@@ -59,11 +59,10 @@ class LGBMRegressorOptimizer(BaseOptimizer):
             'boosting_type',
             self.param_candidates['boosting_type']
         )
-        learning_rate = trial.suggest_float(
+        learning_rate = trial.suggest_loguniform(
             'learning_rate',
             self.param_candidates['learning_rate']['low'],
             self.param_candidates['learning_rate']['high'],
-            step=self.param_candidates['learning_rate']['step'],
         )
         lambda_l1 = trial.suggest_float(
             'lambda_l1',
