@@ -2,9 +2,9 @@
 
 ## Todo
 
-- `optimizer.optimize()` で得たパラメータを明示する(`config.yml` に保存するなど)
 - アンサンブル学習で予測する
-- install kaggle CLI
+- Predict with deep learning
+- `optimizer.optimize()` で得たパラメータを明示する(`config.yml` に保存するなど)
 
 ## Consider
 
