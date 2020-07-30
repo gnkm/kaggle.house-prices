@@ -2,7 +2,8 @@
 
 ## Todo
 
-- アンサンブル学習で予測する
+- bagging
+- optimize parameters of stacked estimators
 - Predict with deep learning
 - `optimizer.optimize()` で得たパラメータを明示する(`config.yml` に保存するなど)
 
