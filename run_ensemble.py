@@ -49,13 +49,25 @@ y_train_all = load_y(col_id_name, col_target_name, dropped_ids)
 X_test = X_test.fillna(X_test.mean())
 
 # Stacking
-lasso = make_pipeline(RobustScaler(), Lasso(alpha =0.0005, random_state=1))
-ENet = make_pipeline(RobustScaler(), ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3))
+lasso = make_pipeline(
+    RobustScaler(),
+    Lasso(alpha =0.0005, random_state=1)
+)
+ENet = make_pipeline(
+    RobustScaler(),
+    ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+)
 KRR = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
-GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
-                                   max_depth=4, max_features='sqrt',
-                                   min_samples_leaf=15, min_samples_split=10, 
-                                   loss='huber', random_state =5)
+GBoost = GradientBoostingRegressor(
+    n_estimators=3000,
+    learning_rate=0.05,
+    max_depth=4,
+    max_features='sqrt',
+    min_samples_leaf=15,
+    min_samples_split=10,
+    loss='huber',
+    random_state =5
+)
 
 estimators = [
     ('lasso', lasso),
@@ -65,8 +77,10 @@ estimators = [
 ]
 regressor = StackingRegressor(
     estimators=estimators,
-    final_estimator=RandomForestRegressor(n_estimators=10,
-                                          random_state=42)
+    final_estimator=RandomForestRegressor(
+        n_estimators=10,
+        random_state=42
+    )
 )
 # Train
 regressor.fit(X_train_all, y_train_all)
