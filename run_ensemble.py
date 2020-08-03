@@ -14,7 +14,7 @@ import yaml
 
 # from models import lgbm as my_lgbm
 from cv import r2_cv
-from param_tuning.optimizer import LGBMRegressorOptimizer
+from param_tuning.optimizer import LassoOptimizer, LGBMRegressorOptimizer
 from preprocessing import load_x, load_y
 from utils import print_exit, print_float
 
@@ -36,9 +36,8 @@ features = config['extracted_features']
 col_id_name = config['col_id_name']
 col_target_name = config['col_target_name']
 dropped_ids = config['dropped_ids']
-lgbm_params = config['lgbm_params']
 n_folds = config['cv']['n_folds']
-param_candidates = config['lgbm_params']['candidates']
+hyper_parameters = config['params']
 
 Xs = load_x(features, dropped_ids)
 X_train_all = Xs['train']
@@ -48,11 +47,28 @@ y_train_all = load_y(col_id_name, col_target_name, dropped_ids)
 # @todo: Modify preprocessor
 X_test = X_test.fillna(X_test.mean())
 
-# Stacking
+lasso_with_param_candidates = make_pipeline(
+    RobustScaler(),
+    Lasso(
+        random_state=hyper_parameters['lasso']['instance']['random_state']
+    )
+)
+lasso_optimizer = LassoOptimizer(
+    lasso_with_param_candidates,
+    X_train_all,
+    y_train_all,
+    n_folds,
+    hyper_parameters['lasso']['candidates'],
+)
+lasso_best_params = lasso_optimizer.optimize()
 lasso = make_pipeline(
     RobustScaler(),
-    Lasso(alpha =0.0005, random_state=1)
+    Lasso(
+        alpha=lasso_best_params['lasso__alpha'],
+        random_state=hyper_parameters['lasso']['instance']['random_state'],
+    )
 )
+
 ENet = make_pipeline(
     RobustScaler(),
     ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
@@ -69,13 +85,43 @@ GBoost = GradientBoostingRegressor(
     random_state =5
 )
 
+lgbm_instance_params = hyper_parameters['lgbm']['instance']
+lgbm_regressor_with_param_candidates = LGBMRegressor(
+    random_state=lgbm_instance_params['random_state'],
+    silent=lgbm_instance_params['silent'],
+)
+
+lgbm_optimizer = LGBMRegressorOptimizer(
+    lgbm_regressor_with_param_candidates,
+    X_train_all,
+    y_train_all,
+    n_folds,
+    hyper_parameters['lgbm']['candidates']
+)
+lgbm_best_params = lgbm_optimizer.optimize()
+
+lgbm_regressor_with_optimized_params = LGBMRegressor(
+    boosting_type=lgbm_best_params['boosting_type'],
+    learning_rate=lgbm_best_params['learning_rate'],
+    lambda_l1=lgbm_best_params['lambda_l1'],
+    lambda_l2=lgbm_best_params['lambda_l2'],
+    # default params
+    random_state=lgbm_instance_params['random_state'],
+    silent=lgbm_instance_params['silent'],
+)
+lgbm_regressor_with_optimized_params.fit(X_train_all, y_train_all)
+lgbm_y_pred_logarithmic = lgbm_regressor_with_optimized_params.predict(X_test)  # error
+lgbm_y_pred = np.exp(lgbm_y_pred_logarithmic)
+
+# Stacking
 estimators = [
     ('lasso', lasso),
     ('ENet', ENet),
     ('KRR', KRR),
     ('GBoost', GBoost),
+    ('LGBM', lgbm_regressor_with_optimized_params),
 ]
-regressor = StackingRegressor(
+stacking_regressor = StackingRegressor(
     estimators=estimators,
     final_estimator=RandomForestRegressor(
         n_estimators=10,
@@ -83,12 +129,12 @@ regressor = StackingRegressor(
     )
 )
 # Train
-regressor.fit(X_train_all, y_train_all)
+stacking_regressor.fit(X_train_all, y_train_all)
 # Predict
-y_pred_logarithmic = regressor.predict(X_test)  # error
+y_pred_logarithmic = stacking_regressor.predict(X_test)  # error
 y_pred = np.exp(y_pred_logarithmic)
 # Evaluate
-scores = r2_cv(regressor, X_train_all, y_train_all, n_folds)
+scores = r2_cv(stacking_regressor, X_train_all, y_train_all, n_folds)
 
 score = scores.mean()
 

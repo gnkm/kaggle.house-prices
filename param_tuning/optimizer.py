@@ -49,6 +49,27 @@ class BaseOptimizer(metaclass=ABCMeta):
         raise NotImplementedError
 
 
+class LassoOptimizer(BaseOptimizer):
+    """Optimizer for Lasso.
+
+    Function `objective` is implemented in this class.
+    """
+    def objective(self, trial):
+        alpha = trial.suggest_loguniform(
+            'lasso__alpha',
+            self.param_candidates['alpha']['low'],
+            self.param_candidates['alpha']['high'],
+        )
+        model = self.model
+        model.set_params(
+            lasso__alpha=alpha
+        )
+        X_train = self.X_train
+        y_train = self.y_train
+        n_folds = self.n_folds
+        return r2_cv(model, X_train, y_train, n_folds).mean()
+
+
 class LGBMRegressorOptimizer(BaseOptimizer):
     """Optimizer for LGBMRegressor.
 

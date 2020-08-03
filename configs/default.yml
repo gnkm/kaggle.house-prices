@@ -12,19 +12,26 @@ dropped_ids:
   - 524
   - 1299
 # Reference: https://lightgbm.readthedocs.io/en/latest/Parameters-Tuning.html
-lgbm_params:
-  instance:
-    random_state: 0
-    silent: True
-  candidates:
-    boosting_type: [gbdt]
-    learning_rate: {low: 0.0001, high: 0.1}
-    lambda_l1: {low: 0.1, high: 1.0, step: 0.1}
-    lambda_l2: {low: 0, high: 0, step: 0.1}
-  fit:
-    categorical_feature:
-      - HasGarage
-      - HasBsmt
+# Hyper parameters
+params:
+  lasso:
+    instance:
+      random_state: 0
+    candidates:
+      alpha: {low: 0.0001, high: 0.1}
+  lgbm:
+    instance:
+      random_state: 0
+      silent: True
+    candidates:
+      boosting_type: [gbdt]
+      learning_rate: {low: 0.0001, high: 0.1}
+      lambda_l1: {low: 0.1, high: 1.0, step: 0.1}
+      lambda_l2: {low: 0, high: 0, step: 0.1}
+    fit:
+      categorical_feature:
+        - HasGarage
+        - HasBsmt
 cv:
   # Don't use `learning_curve()`, try following numbers by hand.
   # n_folds: 3
