@@ -3,11 +3,17 @@
 ## Todo
 
 - bagging
+  - その場合の評価
 - optimize parameters of stacked estimators
 - Predict with deep learning
+- Logging: 時間のかかっている処理を明らかにする
 - `optimizer.optimize()` で得たパラメータを明示する(`config.yml` に保存するなど)
 
 ## Consider
+
+### Optimize Parameters of Stacked Estimators
+
+regressor ごとにチューニングしてから stacking する．
 
 ### Preprocessing
 
