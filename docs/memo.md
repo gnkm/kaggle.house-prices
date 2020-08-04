@@ -4,9 +4,9 @@
 
 - bagging
   - その場合の評価
-- optimize parameters of stacked estimators
 - Predict with deep learning
 - Logging: 時間のかかっている処理を明らかにする
+- Separate param tuning script
 - `optimizer.optimize()` で得たパラメータを明示する(`config.yml` に保存するなど)
 
 ## Consider
@@ -14,6 +14,26 @@
 ### Optimize Parameters of Stacked Estimators
 
 regressor ごとにチューニングしてから stacking する．
+
+### Invalid Parameters Error
+
+> ValueError: Invalid parameter ENet for estimator Pipeline
+> Check the list of available parameters with `estimator.get_params().keys()`.
+
+`optimizer.py` の中のパラメータ名称について．
+下記例の `'elasticnet__l1_ratio'` は
+`model` を定義した後，`model.get_params().keys()` で確認する．
+
+```
+        l1_ratio = trial.suggest_float(
+            'elasticnet__l1_ratio',
+            self.param_candidates['l1_ratio']['low'],
+            self.param_candidates['l1_ratio']['high'],
+            step=self.param_candidates['l1_ratio']['step'],
+        )
+        model = self.model
+        print(model.get_params().keys())
+```
 
 ### Preprocessing
 

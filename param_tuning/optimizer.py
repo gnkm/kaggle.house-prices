@@ -49,6 +49,34 @@ class BaseOptimizer(metaclass=ABCMeta):
         raise NotImplementedError
 
 
+class ENetOptimizer(BaseOptimizer):
+    """Optimizer for ElasticNet.
+
+    Function `objective` is implemented in this class.
+    """
+    def objective(self, trial):
+        alpha = trial.suggest_loguniform(
+            'elasticnet__alpha',
+            self.param_candidates['alpha']['low'],
+            self.param_candidates['alpha']['high'],
+        )
+        l1_ratio = trial.suggest_float(
+            'elasticnet__l1_ratio',
+            self.param_candidates['l1_ratio']['low'],
+            self.param_candidates['l1_ratio']['high'],
+            step=self.param_candidates['l1_ratio']['step'],
+        )
+        model = self.model
+        model.set_params(
+            elasticnet__alpha=alpha,
+            elasticnet__l1_ratio=l1_ratio,
+        )
+        X_train = self.X_train
+        y_train = self.y_train
+        n_folds = self.n_folds
+        return r2_cv(model, X_train, y_train, n_folds).mean()
+
+
 class LassoOptimizer(BaseOptimizer):
     """Optimizer for Lasso.
 

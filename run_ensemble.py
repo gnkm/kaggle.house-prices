@@ -14,7 +14,7 @@ import yaml
 
 # from models import lgbm as my_lgbm
 from cv import r2_cv
-from param_tuning.optimizer import LassoOptimizer, LGBMRegressorOptimizer
+from param_tuning.optimizer import ENetOptimizer, LassoOptimizer, LGBMRegressorOptimizer
 from preprocessing import load_x, load_y
 from utils import print_exit, print_float
 
@@ -36,6 +36,7 @@ features = config['extracted_features']
 col_id_name = config['col_id_name']
 col_target_name = config['col_target_name']
 dropped_ids = config['dropped_ids']
+random_state = config['random_state']
 n_folds = config['cv']['n_folds']
 hyper_parameters = config['params']
 
@@ -47,10 +48,11 @@ y_train_all = load_y(col_id_name, col_target_name, dropped_ids)
 # @todo: Modify preprocessor
 X_test = X_test.fillna(X_test.mean())
 
+# Lasso
 lasso_with_param_candidates = make_pipeline(
     RobustScaler(),
     Lasso(
-        random_state=hyper_parameters['lasso']['instance']['random_state']
+        random_state=random_state
     )
 )
 lasso_optimizer = LassoOptimizer(
@@ -65,13 +67,32 @@ lasso = make_pipeline(
     RobustScaler(),
     Lasso(
         alpha=lasso_best_params['lasso__alpha'],
-        random_state=hyper_parameters['lasso']['instance']['random_state'],
+        random_state=random_state,
     )
 )
 
+# Elasticnet
+enet_with_param_candidates = make_pipeline(
+    RobustScaler(),
+    ElasticNet(
+        random_state=random_state
+    )
+)
+enet_optimizer = ENetOptimizer(
+    enet_with_param_candidates,
+    X_train_all,
+    y_train_all,
+    n_folds,
+    hyper_parameters['enet']['candidates']
+)
+enet_best_params = enet_optimizer.optimize()
 ENet = make_pipeline(
     RobustScaler(),
-    ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3)
+    ElasticNet(
+        alpha=enet_best_params['elasticnet__alpha'],
+        l1_ratio=enet_best_params['elasticnet__l1_ratio'],
+        random_state=random_state,
+    )
 )
 KRR = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
 GBoost = GradientBoostingRegressor(
@@ -87,7 +108,7 @@ GBoost = GradientBoostingRegressor(
 
 lgbm_instance_params = hyper_parameters['lgbm']['instance']
 lgbm_regressor_with_param_candidates = LGBMRegressor(
-    random_state=lgbm_instance_params['random_state'],
+    random_state=random_state,
     silent=lgbm_instance_params['silent'],
 )
 
@@ -106,7 +127,7 @@ lgbm_regressor_with_optimized_params = LGBMRegressor(
     lambda_l1=lgbm_best_params['lambda_l1'],
     lambda_l2=lgbm_best_params['lambda_l2'],
     # default params
-    random_state=lgbm_instance_params['random_state'],
+    random_state=random_state,
     silent=lgbm_instance_params['silent'],
 )
 lgbm_regressor_with_optimized_params.fit(X_train_all, y_train_all)
