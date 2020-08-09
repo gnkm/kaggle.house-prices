@@ -8,6 +8,7 @@
 - Logging: 時間のかかっている処理を明らかにする
 - Separate param tuning script
 - `optimizer.optimize()` で得たパラメータを明示する(`config.yml` に保存するなど)
+- pdpipe で前処理のフローをわかりやすくする
 
 ## Consider
 
