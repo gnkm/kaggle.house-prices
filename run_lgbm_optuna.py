@@ -70,7 +70,7 @@ regressor_with_optimized_params = LGBMRegressor(
 regressor_with_optimized_params.fit(X_train_all, y_train_all)
 # Predict
 y_pred_logarithmic = regressor_with_optimized_params.predict(X_test)
-y_pred = np.exp(y_pred_logarithmic)
+y_pred = np.expm1(y_pred_logarithmic)
 
 # Evaluate
 scores = r2_cv(regressor_with_optimized_params, X_train_all, y_train_all, n_folds)
